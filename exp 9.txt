@@ -1,0 +1,64 @@
+ import numpy as np 
+import os, cv2
+ from tensorflow.keras.utils import to_categorical
+ from tensorflow.keras.models import Sequential
+ from tensorflow.keras.layers import Dense, Conv2D, Dropout, Flatten, MaxPooling2D
+ from tensorflow.keras.callbacks import EarlyStopping
+ from tensorflow.keras.preprocessing.image import ImageDataGenerator
+ train_path = r"C:\Users\Pratham\Downloads\exp_9_dataset (2)\dataset\training_set"
+ test_path = r"C:\Users\Pratham\Downloads\exp_9_dataset (2)\dataset\test_set"
+ def load_images_from_folder(folder):
+ images, labels = [],[]
+ classes = os.listdir(folder)
+ classes.sort()
+ for idx, cls in enumerate(classes):
+ cls_folder = os.path.join(folder, cls)
+ if not os.path.isdir(cls_folder):
+ continue
+ for img_file in os.listdir(cls_folder):
+ img_path = os.path.join(cls_folder, img_file)
+ img = cv2.imread(img_path)
+ if img is not None:
+ img = cv2.resize(img, (128,128))
+ images.append(img)
+ labels.append(idx)
+ return np.array(images) / 255.0, to_categorical(labels, num_classes = len(classes)), classes            
+x_train, y_train, classes = load_images_from_folder(train_path)
+ x_val, y_val, _ = load_images_from_folder(test_path)
+ x_train
+ classes
+ ['cats', 'dogs']
+ early_stop = EarlyStopping(
+ monitor = 'val_accuracy',
+ patience = 5,
+ restore_best_weights = True
+ datagen.fit(x_train)
+ model = Sequential([
+ Conv2D(32, kernel_size = (3,3), activation = 'relu', input_shape = (128,128,3)),
+ MaxPooling2D(2,2),
+ Dropout(0.3),
+ Conv2D(64, kernel_size = (3,3), activation = 'relu'),
+ MaxPooling2D(2,2),
+ Dropout(0.3),
+ Conv2D(128, kernel_size = (3,3), activation = 'relu'),
+ MaxPooling2D(2,2),
+ Dropout(0.3),
+ Conv2D(256, kernel_size = (3,3), activation = 'relu'),
+ MaxPooling2D(2,2),
+ Dropout(0.3),
+ Flatten(),
+ Dense(256, activation = 'relu'),
+ Dropout(0.5),
+ Dense(len(classes), activation = 'softmax')])
+ model.compile(optimizer = 'adam', loss = 'categorical_crossentropy', metrics = ['accuracy'])
+ model.summary()
+ history = model.fit(x_train, y_train, batch_size = 30, epochs = 10) 
+ test_loss , test_acc = model.evaluate(x_val, y_val, verbose = 2)
+ print('accuracy:', test_acc * 100)
+ 63/63 - 3s - 40ms/step - accuracy: 0.8060 - loss: 0.4263
+ accuracy: 80.59999942779541
+ model.save('Classification.keras')
+ print("saved")
+ saved
+ import streamlit as st 
+from PIL import Image

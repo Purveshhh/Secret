@@ -1,0 +1,21 @@
+ import tensorflow as tf
+ from tensorflow.keras import datasets, layers, models
+ import matplotlib.pyplot as plt
+ (x_train, y_train), (x_test, y_test) = datasets.mnist.load_data()
+ x_train, x_test = x_train / 255.0, x_test / 255.0
+ x_train = x_train.reshape(-1, 28,28,1)
+ x_test = x_test.reshape( -1, 28, 28, 1)
+ from tensorflow.keras.layers import Conv2D, AveragePooling2D, Dense, Flatt
+ model = models.Sequential([
+ Conv2D(6, kernel_size = (5,5), activation = 'tanh', input_shape = (28,28
+ AveragePooling2D(pool_size=(2,2)),
+ Conv2D(16, kernel_size = (5,5), activation = 'tanh'),
+ AveragePooling2D(pool_size = (2,2)),
+ layers.Flatten(),
+ Dense(120, activation = 'tanh'),
+ Dense(84, activation = 'tanh'),
+ #output layer
+ Dense(10, activation = 'softmax')])
+ model.compile(optimizer = 'adam', loss = 'sparse_categorical_crossentropy',metrics = 'accuracy')
+ test_loss, test_acc = model.evaluate(x_test, y_test, verbose = 2)
+ print('accuracy:', test_acc * 100)

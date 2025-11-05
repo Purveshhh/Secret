@@ -1,0 +1,36 @@
+import pandas as pd 
+df = pd.read_csv('/content/data.csv')
+df.head(10)
+df.diagnosis.value_counts()
+ import numpy as np 
+x = df.drop(['id','diagnosis'], axis = 1)
+ y = df.diagnosis
+ from sklearn.preprocessing import LabelEncoder
+ label = LabelEncoder()
+ y = label.fit_transform(y)
+ from sklearn.model_selection import train_test_split 
+x_train, x_test, y_train, y_test = train_test_split(x,y,test_size = 0.2, ran
+ from sklearn.preprocessing import StandardScaler
+ sc = StandardScaler()
+ x_train = sc.fit_transform(x_train)
+ x_test = sc.transform(x_test)
+ x_test
+x_train
+ import keras
+ from keras.models import Sequential
+ from keras.layers import Dense
+ classifier = Sequential()
+ classifier.add(Dense(16,kernel_initializer='uniform', activation = 'relu', i
+ classifier.add(Dense(16,kernel_initializer='uniform', activation = 'relu'))
+ classifier.add(Dense(1,kernel_initializer='uniform', activation = 'sigmoid')
+ classifier.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics
+ classifier.fit(x_train, y_train, batch_size = 100, epochs = 150, verbose = 1)
+ y_pred = classifier.predict(x_test)
+ y_pred = (y_pred > 0.5)
+ from sklearn.metrics import classification_report, confusion_matrix
+ print(classification_report(y_test, y_pred))
+ import seaborn as sns
+ cm = confusion_matrix(y_test, y_pred)
+ sns.heatmap(cm, annot = True)
+ <Axes: >
+              
