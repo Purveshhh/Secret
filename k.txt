@@ -1,0 +1,30 @@
+import numpy as np 
+import matplotlib.pyplot as plt 
+
+data = np.array([[1,2],[1.5, 1.8], [5,8],[8,8],[1,0.6],[9,11]])
+k = 2 
+centroids = data[np.random.choice(len(data), k, replace =False)]
+
+for _ in range(10):
+    assignments = [(np.argmin([np.linalg.norm(p - c) for c in centroids]), p) for p in data]
+    new_centroids = []
+    for i in range(k):
+        points = np.array([p for c_idx, p in assignments if c_idx == i])
+        new_centroids.append(points.mean(axis=0) if len(points) else centroids[i])
+    new_centroids = np.array(new_centroids)
+    if np.allclose(centroids, new_centroids):
+        break
+    centroids = new_centroids    
+
+print("Centroids:", centroids)
+colors = ['red', 'blue', 'green', 'purple', 'orange']
+for i in range(k):
+    points = np.array([p for c_idx, p in assignments if c_idx == i])
+    plt.scatter(points[:,0], points[:,1], color = colors[i], label = f'Cluster {i+i}')
+plt.scatter(centroids[:,0],centroids[:,1], marker = 'X' , s = 200, color = 'black', label = 'Centroids')
+plt.title('K-Means Clustering (Simulated MapReduce)')
+plt.xlabel('X')
+plt.ylabel('Y')
+plt.legend()
+plt.grid(True)
+plt.show()
