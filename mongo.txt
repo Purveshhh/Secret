@@ -1,0 +1,89 @@
+---------------------- HOSPITAL SCENARIO MONGODB QUERIES ----------------------
+
+# ✅ INSERT DATA
+
+db.patients.insertMany([
+  { _id: 1, name: "Alice", age: 25, disease: "Fever" },
+  { _id: 2, name: "Bob", age: 40, disease: "Diabetes" },
+  { _id: 3, name: "Charlie", age: 32, disease: "Flu" }
+])
+
+db.doctors.insertMany([
+  { _id: 101, name: "Dr. Sharma", specialty: "Cardiology" },
+  { _id: 102, name: "Dr. Mehta", specialty: "General Physician" }
+])
+
+db.appointments.insertMany([
+  { patient_id: 1, doctor_id: 102, date: "2024-01-12", fees: 500 },
+  { patient_id: 2, doctor_id: 101, date: "2024-01-13", fees: 1200 },
+  { patient_id: 3, doctor_id: 102, date: "2024-01-15", fees: 700 }
+])
+
+
+# ✅ DELETE QUERIES
+
+db.patients.deleteOne({ name: "Charlie" })
+
+db.appointments.deleteMany({ doctor_id: 102 })
+
+
+# ✅ UPDATE QUERIES
+
+db.patients.updateOne(
+  { name: "Alice" },
+  { $set: { disease: "Malaria" } }
+)
+
+db.patients.updateMany(
+  { age: { $gt: 40 } },
+  { $set: { highRisk: true } }
+)
+
+
+# ✅ COMPARISON (LESS THAN / GREATER THAN)
+
+db.patients.find({ age: { $gt: 30 } })      # age > 30
+db.patients.find({ age: { $lte: 30 } })     # age <= 30
+db.appointments.find({ fees: { $lt: 1000 } })  # fees < 1000
+
+
+# ✅ AVERAGE QUERY (FEES)
+
+db.appointments.aggregate([
+  { $group: { _id: null, averageFees: { $avg: "$fees" } } }
+])
+
+
+# ✅ AGGREGATION PIPELINE
+
+# 1. Count number of patients per disease
+db.patients.aggregate([
+  { $group: { _id: "$disease", totalPatients: { $sum: 1 } } }
+])
+
+# 2. Show appointments with patient + doctor info (JOIN)
+db.appointments.aggregate([
+  {
+    $lookup: {
+      from: "patients",
+      localField: "patient_id",
+      foreignField: "_id",
+      as: "patientInfo"
+    }
+  },
+  {
+    $lookup: {
+      from: "doctors",
+      localField: "doctor_id",
+      foreignField: "_id",
+      as: "_doctorInfo"
+    }
+  }
+])
+
+# 3. Total earnings per doctor
+db.appointments.aggregate([
+  { $group: { _id: "$doctor_id", totalEarnings: { $sum: "$fees" } } }
+])
+
+-------------------------------------------------------------------------------
